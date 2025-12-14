@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Vocal Training App
+
+A Next.js React application that helps users develop their singing voice by detecting their vocal range and practicing pitch matching.
+
+## Features
+
+- **Vocal Range Detection**: Detect your lowest and highest comfortable notes (A1-F6 range)
+- **Pitch Matching Game**: Listen to notes within your range and practice matching them
+- **Scoring System**: Earn points based on how long you stay on pitch
+- **Adjustable Note Duration**: Choose between short (3s), medium (6s), or long (9s) note durations
+- **Session Management**: Uses localStorage to remember your vocal range and session
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies and run the development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Note**: You'll need to allow microphone access when prompted for the app to work properly.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## How to Use
 
-## Learn More
+1. **Detect Your Vocal Range**:
+   - Click "Detect Low Note" and sing your lowest comfortable note. Hold it steady until detected.
+   - Click "Detect High Note" and sing your highest comfortable note. Hold it steady until detected.
 
-To learn more about Next.js, take a look at the following resources:
+2. **Play the Game**:
+   - Once your range is detected, click "Play Game"
+   - Choose your preferred note duration (short, medium, or long)
+   - Click "Play Note" to hear a random note within your range
+   - Click "Start Singing" after the note plays and try to match the pitch
+   - Your score increases based on how long you stay on pitch
+   - Click "Next Round" to continue to the next note
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Technical Details
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Built with Next.js 16, React 19, and TypeScript
+- Uses Web Audio API for microphone input and audio playback
+- Pitch detection using autocorrelation algorithm
+- Note frequencies calculated using standard musical tuning
+- Tailwind CSS for styling
 
-## Deploy on Vercel
+## Browser Compatibility
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Requires a modern browser with Web Audio API support (Chrome, Firefox, Safari, Edge).
