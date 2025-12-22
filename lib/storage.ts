@@ -4,6 +4,7 @@ const STORAGE_KEYS = {
   SESSION_ID: 'vocal_session_id',
   LOW_NOTE: 'vocal_low_note',
   HIGH_NOTE: 'vocal_high_note',
+  PRACTICE_HISTORY: 'vocal_practice_history',
 } as const;
 
 export interface StoredNote {
@@ -55,5 +56,47 @@ export function getHighNote(): StoredNote | null {
 // Check if vocal range is detected
 export function hasVocalRange(): boolean {
   return getLowNote() !== null && getHighNote() !== null;
+}
+
+// Practice history types
+export interface PitchDataPoint {
+  time: number; // Time in seconds
+  frequency: number | null; // Detected frequency, or null if no pitch detected
+}
+
+export interface PracticeRecording {
+  id: string;
+  timestamp: number;
+  fileName: string;
+  originalDuration: number;
+  originalPitchData: PitchDataPoint[];
+  userPitchData: PitchDataPoint[];
+  score: number; // Overall score 0-100
+  audioBlob?: Blob; // Optional: store the user's recording
+}
+
+// Save practice recording
+export function savePracticeRecording(recording: PracticeRecording): void {
+  if (typeof window === 'undefined') return;
+  const history = getPracticeHistory();
+  history.push(recording);
+  // Keep only last 50 recordings to avoid storage issues
+  const limitedHistory = history.slice(-50);
+  localStorage.setItem(STORAGE_KEYS.PRACTICE_HISTORY, JSON.stringify(limitedHistory));
+}
+
+// Get practice history
+export function getPracticeHistory(): PracticeRecording[] {
+  if (typeof window === 'undefined') return [];
+  const stored = localStorage.getItem(STORAGE_KEYS.PRACTICE_HISTORY);
+  return stored ? JSON.parse(stored) : [];
+}
+
+// Delete practice recording
+export function deletePracticeRecording(id: string): void {
+  if (typeof window === 'undefined') return;
+  const history = getPracticeHistory();
+  const filtered = history.filter(r => r.id !== id);
+  localStorage.setItem(STORAGE_KEYS.PRACTICE_HISTORY, JSON.stringify(filtered));
 }
 

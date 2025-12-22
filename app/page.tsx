@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import MainMenu from '@/components/MainMenu';
 import VocalRangeDetection from '@/components/VocalRangeDetection';
 import Game from '@/components/Game';
+import VocalPractice from '@/components/VocalPractice';
 import { getSessionId } from '@/lib/storage';
 import { Note } from '@/lib/audio-utils';
 
-type View = 'menu' | 'detectLow' | 'detectHigh' | 'game';
+type View = 'menu' | 'detectLow' | 'detectHigh' | 'game' | 'practice';
 
 export default function Home() {
   const [currentView, setCurrentView] = useState<View>('menu');
@@ -41,6 +42,14 @@ export default function Home() {
     setCurrentView('menu');
   };
 
+  const handlePractice = () => {
+    setCurrentView('practice');
+  };
+
+  const handlePracticeBack = () => {
+    setCurrentView('menu');
+  };
+
   return (
     <main>
       {currentView === 'menu' && (
@@ -48,6 +57,7 @@ export default function Home() {
           onDetectLow={handleDetectLow}
           onDetectHigh={handleDetectHigh}
           onPlayGame={handlePlayGame}
+          onPractice={handlePractice}
         />
       )}
       {currentView === 'detectLow' && (
@@ -65,6 +75,7 @@ export default function Home() {
         />
       )}
       {currentView === 'game' && <Game onBack={handleGameBack} />}
+      {currentView === 'practice' && <VocalPractice onBack={handlePracticeBack} />}
     </main>
   );
 }

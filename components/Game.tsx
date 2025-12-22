@@ -5,6 +5,7 @@ import { Note, playTone, detectPitch, frequencyToNote, isOnPitch, getNotesInRang
 import { getLowNote, getHighNote } from '@/lib/storage';
 import PitchVisualization from '@/components/PitchVisualization';
 import SingingTips from '@/components/SingingTips';
+import VolumeMeter from '@/components/VolumeMeter';
 
 interface GameProps {
   onBack: () => void;
@@ -30,14 +31,13 @@ export default function Game({ onBack }: GameProps) {
   const [timeOnTone, setTimeOnTone] = useState(0);
   const [isOnPitchState, setIsOnPitchState] = useState(false);
   const [roundScore, setRoundScore] = useState(0);
-  const [volumeLevel, setVolumeLevel] = useState(0);
   const [currentPitch, setCurrentPitch] = useState<number | null>(null);
   
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const dataArrayRef = useRef<Float32Array | null>(null);
   const animationFrameRef = useRef<number | null>(null);
-  const volumeAnimationFrameRef = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const availableNotesRef = useRef<Note[]>([]);
   const startTimeRef = useRef<number | null>(null);
@@ -96,28 +96,8 @@ export default function Game({ onBack }: GameProps) {
         source.connect(analyser);
 
         analyserRef.current = analyser;
+        setAnalyser(analyser);
         dataArrayRef.current = new Float32Array(analyser.frequencyBinCount);
-
-        // Start volume monitoring
-        const monitorVolume = () => {
-          if (!analyserRef.current || !dataArrayRef.current) return;
-
-          const audioData = new Float32Array(dataArrayRef.current.length);
-          analyserRef.current.getFloatTimeDomainData(audioData);
-
-          // Calculate RMS for volume level
-          let sum = 0;
-          for (let i = 0; i < audioData.length; i++) {
-            sum += audioData[i] * audioData[i];
-          }
-          const rms = Math.sqrt(sum / audioData.length);
-          const volume = Math.min(rms * 10, 1);
-          setVolumeLevel(volume);
-
-          volumeAnimationFrameRef.current = requestAnimationFrame(monitorVolume);
-        };
-
-        monitorVolume();
       } catch (error) {
         console.error('Error accessing microphone:', error);
       }
@@ -135,9 +115,6 @@ export default function Game({ onBack }: GameProps) {
       }
       if (recordingTimerIntervalRef.current) {
         clearInterval(recordingTimerIntervalRef.current);
-      }
-      if (volumeAnimationFrameRef.current) {
-        cancelAnimationFrame(volumeAnimationFrameRef.current);
       }
     };
   }, []);
@@ -164,9 +141,6 @@ export default function Game({ onBack }: GameProps) {
   const cleanup = () => {
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
-    }
-    if (volumeAnimationFrameRef.current) {
-      cancelAnimationFrame(volumeAnimationFrameRef.current);
     }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
@@ -296,6 +270,7 @@ export default function Game({ onBack }: GameProps) {
         source.connect(analyser);
 
         analyserRef.current = analyser;
+        setAnalyser(analyser);
         dataArrayRef.current = new Float32Array(analyser.frequencyBinCount);
       } catch (error) {
         console.error('Error accessing microphone:', error);
@@ -498,20 +473,7 @@ export default function Game({ onBack }: GameProps) {
         </div>
 
         {/* Volume Meter */}
-        <div className="mb-4">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Volume:</span>
-            <div className="flex-1 h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 transition-all duration-75 ease-out"
-                style={{ width: `${volumeLevel * 100}%` }}
-              />
-            </div>
-            <span className="text-xs text-gray-500 dark:text-gray-500 w-10 text-right">
-              {Math.round(volumeLevel * 100)}%
-            </span>
-          </div>
-        </div>
+        <VolumeMeter analyser={analyser} />
 
         {currentNote && (
           <div className="mb-6">
