@@ -7,9 +7,10 @@ interface MainMenuProps {
   onDetectLow: () => void;
   onDetectHigh: () => void;
   onPlayGame: () => void;
+  onPractice: () => void;
 }
 
-export default function MainMenu({ onDetectLow, onDetectHigh, onPlayGame }: MainMenuProps) {
+export default function MainMenu({ onDetectLow, onDetectHigh, onPlayGame, onPractice }: MainMenuProps) {
   const [lowNote, setLowNote] = useState<{ name: string; octave: number } | null>(null);
   const [highNote, setHighNote] = useState<{ name: string; octave: number } | null>(null);
 
@@ -63,6 +64,13 @@ export default function MainMenu({ onDetectLow, onDetectHigh, onPlayGame }: Main
                 Please detect your vocal range first
               </span>
             )}
+          </button>
+
+          <button
+            onClick={onPractice}
+            className="w-full py-4 px-6 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg"
+          >
+            Practice with Sample
           </button>
         </div>
 

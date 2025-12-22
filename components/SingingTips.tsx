@@ -1,146 +1,260 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-const SINGING_TIPS = [
-  "Breathe from your diaphragm, not your chest. Place your hand on your stomach and feel it expand as you inhale.",
-  "Practice vocal warm-ups before singing to prevent strain and improve flexibility.",
-  "Stay hydrated! Water helps keep your vocal cords lubricated and healthy.",
-  "Maintain good posture. Stand or sit straight with your shoulders relaxed.",
-  "Practice consistently, even if it's just 15-20 minutes daily.",
-  "Record yourself singing to identify areas for improvement.",
-  "Learn to listen critically to pitch accuracy and tone quality.",
-  "Work on your breathing control to sustain longer phrases.",
-  "Practice scales and arpeggios to improve pitch accuracy.",
-  "Don't strain your voice. If it hurts, stop and rest.",
-  "Warm up your voice gently, starting with low notes and gradually moving higher.",
-  "Practice vowel sounds (A, E, I, O, U) to improve clarity.",
-  "Use your body to support your voice - engage your core muscles.",
-  "Practice matching pitches with a piano or tuning app.",
-  "Work on your resonance by finding your 'mask' (the area around your nose and mouth).",
-  "Sing with emotion and expression, not just correct notes.",
-  "Practice in a quiet space where you can hear yourself clearly.",
-  "Take breaks during practice sessions to avoid vocal fatigue.",
-  "Learn proper breath support by practicing 'hissing' exercises.",
-  "Practice singing through a straw to improve breath control and reduce tension.",
-  "Work on your vibrato naturally - don't force it.",
-  "Practice singing different genres to expand your versatility.",
-  "Learn proper diction and articulation for clear singing.",
-  "Practice interval training to improve pitch recognition.",
-  "Work on your chest voice and head voice balance.",
-  "Practice dynamics - soft to loud and back again.",
-  "Learn to sing with proper vowel modification for different registers.",
-  "Practice legato (smooth) singing to connect your notes.",
-  "Work on your falsetto if you're a male singer.",
-  "Practice breathy vs. full voice to develop vocal colors.",
-  "Learn to sing with a relaxed jaw and open throat.",
-  "Practice staccato (short, detached) notes for precision.",
-  "Work on your lower register by practicing descending scales.",
-  "Practice singing with a metronome to improve rhythm.",
-  "Learn proper tongue placement for clearer enunciation.",
-  "Practice lip trills to improve breath control and warm up.",
-  "Work on your upper register by practicing ascending scales.",
-  "Practice singing acapella to develop independence.",
-  "Learn to blend your registers smoothly (avoiding breaks).",
-  "Practice singing in different languages to expand range.",
-  "Work on your projection without shouting or straining.",
-  "Practice sight-reading to improve musical literacy.",
-  "Learn proper microphone technique if you plan to perform.",
-  "Practice singing while moving to develop stability.",
-  "Work on your vocal agility with runs and riffs.",
-  "Practice singing harmonies to develop ear training.",
-  "Learn to control your vibrato speed and width.",
-  "Practice in different environments (bathroom, car, studio) to adapt.",
-  "Work on your emotional connection to lyrics.",
-  "Practice vocal exercises that target specific problem areas.",
-  "Learn proper hydration timing (not just right before singing).",
-  "Practice singing at different volumes to build control.",
-  "Work on your stage presence and confidence.",
-  "Practice with backing tracks to simulate performance.",
-  "Learn to use consonants effectively for rhythm and clarity.",
-  "Practice vocal rests - silence is part of music too.",
-  "Work on your pitch accuracy with interval drills.",
-  "Practice singing through your passaggio (break between registers).",
-  "Learn to recognize and fix common pitch problems (sharp/flat).",
-  "Practice breathing exercises away from singing.",
-  "Work on your vocal endurance gradually over time.",
-  "Practice singing scales in different keys.",
-  "Learn to use proper vocal placement for different styles.",
-  "Practice with a vocal coach or mentor for feedback.",
-  "Work on your confidence - believe in your voice.",
-  "Practice singing songs you love to maintain motivation.",
-  "Learn proper vocal health habits (avoid smoking, excessive alcohol).",
-  "Practice vocal exercises that strengthen your mix voice.",
-  "Work on your interpretation of songs, not just technique.",
-  "Practice singing with others to develop ensemble skills.",
-  "Learn to handle stage fright and performance anxiety.",
-  "Practice vocal agility exercises (runs, melismas).",
-  "Work on your lower back support for better breath control.",
-  "Practice singing with proper facial expression.",
-  "Learn to use your diaphragm efficiently for breath support.",
-  "Practice vocal sirens (gliding up and down) for flexibility.",
-  "Work on your upper range gradually - don't force it.",
-  "Practice singing with different emotional intentions.",
-  "Learn to recognize when your voice needs rest.",
-  "Practice vocal exercises that improve resonance.",
-  "Work on your chest-to-head voice transition smoothly.",
-  "Practice singing while playing an instrument if you can.",
-  "Learn proper warm-down exercises after practice.",
-  "Practice vocal range expansion exercises carefully.",
-  "Work on your tone quality by experimenting with placement.",
-  "Practice singing covers to learn from other artists.",
-  "Learn to use dynamics to create musical interest.",
-  "Practice vocal exercises that improve breath efficiency.",
-  "Work on your articulation - clear consonants, open vowels.",
-  "Practice singing with proper breath support on long notes.",
-  "Learn to use your head voice without strain.",
-  "Practice vocal exercises that improve pitch stability.",
-  "Work on your lower range by relaxing and opening up.",
-  "Practice singing with a mirror to check posture and expression.",
-  "Learn to use vocal twang for certain styles (country, rock).",
-  "Practice vocal exercises that improve vocal cord closure.",
-  "Work on your falsetto/head voice connection.",
-  "Practice singing with backing vocals to hear harmonies.",
-  "Learn to use your mix voice for a balanced sound.",
-  "Practice vocal exercises that improve agility and speed.",
-  "Work on your breath control by practicing long phrases.",
-  "Practice singing songs slightly above your comfortable range.",
-  "Learn to use proper vocal registration for different styles.",
-  "Practice vocal exercises that strengthen your middle voice.",
-  "Work on your pitch memory by learning songs by ear.",
-  "Practice singing with emotion - let the lyrics guide you.",
-  "Learn to use your voice as an instrument with dynamics.",
+interface Tip {
+  header: string;
+  actions: string[];
+}
+
+const TIPS: Tip[] = [
+  {
+    header: 'Breathe from your diaphragm',
+    actions: [
+      'Place your hand on your belly and breathe so your belly expands, not your chest',
+      'Practice deep breathing exercises daily for 5-10 minutes',
+      'Engage your core muscles when you inhale',
+      'Exhale slowly and controlled while maintaining support'
+    ]
+  },
+  {
+    header: 'Maintain good posture',
+    actions: [
+      'Stand with feet shoulder-width apart, knees slightly bent',
+      'Keep your spine straight but relaxed',
+      'Roll your shoulders back and down',
+      'Align your head so your ears are over your shoulders',
+      'Avoid tensing your neck muscles'
+    ]
+  },
+  {
+    header: 'Warm up your voice before singing',
+    actions: [
+      'Start with gentle humming for 2-3 minutes',
+      'Do lip trills (blowing air through relaxed lips)',
+      'Practice scales slowly, starting in your comfortable range',
+      'Gradually increase volume and range over 10-15 minutes',
+      'Never skip warm-ups, even for short practice sessions'
+    ]
+  },
+  {
+    header: 'Stay hydrated',
+    actions: [
+      'Drink water throughout the day, not just before singing',
+      'Aim for 8-10 glasses of water daily',
+      'Avoid excessive caffeine and alcohol',
+      'Warm water with honey and lemon can soothe your throat',
+      'Room temperature water is best during practice'
+    ]
+  },
+  {
+    header: 'Practice proper vowel formation',
+    actions: [
+      'Keep your jaw relaxed and drop it slightly when opening your mouth',
+      'Shape vowels consistently across your range',
+      'Avoid jaw tension when singing higher notes',
+      'Practice each vowel (A, E, I, O, U) separately',
+      'Maintain space in your mouth for resonance'
+    ]
+  },
+  {
+    header: 'Develop consistent practice habits',
+    actions: [
+      'Practice daily, even if only for 15-20 minutes',
+      'Short, focused sessions are better than long, unfocused ones',
+      'Set specific goals for each practice session',
+      'Record yourself regularly to track progress',
+      'Be patient - vocal improvement takes time'
+    ]
+  },
+  {
+    header: 'Listen to your body',
+    actions: [
+      'Stop immediately if you feel pain or strain',
+      'Take breaks when your voice feels tired',
+      'Recognize the difference between muscle fatigue and vocal strain',
+      'Rest your voice when you have a cold or sore throat',
+      'Don\'t push through hoarseness or loss of voice'
+    ]
+  },
+  {
+    header: 'Build your range gradually',
+    actions: [
+      'Don\'t force notes that feel uncomfortable',
+      'Practice extending your range by just a few semitones at a time',
+      'Focus on maintaining quality as you extend range',
+      'Work on both lower and upper extensions',
+      'High notes require less air, not more force'
+    ]
+  },
+  {
+    header: 'Work on breath control',
+    actions: [
+      'Practice holding long, steady notes',
+      'Try counting while sustaining a single note',
+      'Practice phrases without taking extra breaths',
+      'Learn to use your breath efficiently',
+      'Exhale slowly and evenly to maintain consistent tone'
+    ]
+  },
+  {
+    header: 'Relax your jaw and tongue',
+    actions: [
+      'Practice singing while keeping your jaw loose',
+      'Avoid clenching or tensing your jaw',
+      'Keep your tongue flat and relaxed in your mouth',
+      'Practice tongue twisters to improve flexibility',
+      'Tension in these areas limits your vocal freedom'
+    ]
+  },
+  {
+    header: 'Practice with a mirror',
+    actions: [
+      'Watch for facial tension while singing',
+      'Check that your jaw isn\'t clenching',
+      'Ensure your posture stays correct',
+      'Observe your breathing movements',
+      'Look for unnecessary movements or gestures'
+    ]
+  },
+  {
+    header: 'Develop your ear training',
+    actions: [
+      'Practice matching pitches with a piano or app',
+      'Sing intervals and scales to improve pitch accuracy',
+      'Listen carefully to professional singers',
+      'Try to sing along to recordings',
+      'Practice sight-reading simple melodies'
+    ]
+  },
+  {
+    header: 'Focus on resonance',
+    actions: [
+      'Imagine the sound vibrating in your face/mask area',
+      'Practice humming to feel vibrations in your nose and lips',
+      'Open your throat like you\'re yawning (but don\'t actually yawn)',
+      'Create space in your mouth and throat',
+      'Think about projecting forward, not up or down'
+    ]
+  },
+  {
+    header: 'Work on articulation',
+    actions: [
+      'Practice clear consonant sounds',
+      'Don\'t sacrifice clarity for volume',
+      'Over-articulate when practicing to develop muscle memory',
+      'Practice tongue twisters to improve diction',
+      'Ensure every word is understandable'
+    ]
+  },
+  {
+    header: 'Manage performance anxiety',
+    actions: [
+      'Practice visualization techniques before performing',
+      'Focus on your breathing to calm nerves',
+      'Prepare thoroughly - confidence comes from preparation',
+      'Accept that small mistakes are normal',
+      'Remember that you\'re sharing something beautiful'
+    ]
+  },
+  {
+    header: 'Avoid vocal strain',
+    actions: [
+      'Never yell or scream, even in practice',
+      'Don\'t try to sing over loud music',
+      'Use a microphone when performing in loud environments',
+      'Avoid whispering - it can strain your voice',
+      'Take vocal rest days when needed'
+    ]
+  },
+  {
+    header: 'Practice transitions between registers',
+    actions: [
+      'Work on smooth transitions between chest and head voice',
+      'Practice scales that cross your break point',
+      'Use slides (glissandos) to connect registers',
+      'Develop mixed voice for seamless transitions',
+      'Be patient - register transitions take time to master'
+    ]
+  },
+  {
+    header: 'Get proper rest',
+    actions: [
+      'Aim for 7-9 hours of sleep nightly',
+      'Your voice needs rest to recover and strengthen',
+      'Avoid late-night practice sessions',
+      'Sleep helps muscle memory develop',
+      'Fatigue affects vocal performance significantly'
+    ]
+  },
+  {
+    header: 'Avoid harmful habits',
+    actions: [
+      'Don\'t smoke - it damages vocal cords',
+      'Limit alcohol consumption, especially before singing',
+      'Avoid clearing your throat forcefully',
+      'Don\'t drink extremely cold or hot beverages right before singing',
+      'Avoid excessive talking in noisy environments'
+    ]
+  },
+  {
+    header: 'Seek feedback and instruction',
+    actions: [
+      'Consider taking lessons from a qualified vocal coach',
+      'Ask for honest feedback from trusted listeners',
+      'Record yourself and listen critically',
+      'Join a choir or singing group',
+      'Learn from other singers and share experiences'
+    ]
+  }
 ];
 
 export default function SingingTips() {
-  const [currentTipIndex, setCurrentTipIndex] = useState(0);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [randomTipIndex, setRandomTipIndex] = useState(Math.floor(Math.random() * TIPS.length));
 
-  useEffect(() => {
-    // Randomly select a tip when component mounts
-    setCurrentTipIndex(Math.floor(Math.random() * SINGING_TIPS.length));
-  }, []);
+  // Get a random tip
+  const randomTip = TIPS[randomTipIndex];
 
-  const getRandomTip = () => {
-    setCurrentTipIndex(Math.floor(Math.random() * SINGING_TIPS.length));
+  const handleToggle = () => {
+    setIsExpanded(!isExpanded);
   };
 
   return (
-    <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-800">
-      <div className="flex items-start justify-between mb-2">
-        <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-2">
-          💡 Singing Tip #{currentTipIndex + 1}
-        </h3>
+    <div className="mb-4">
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
         <button
-          onClick={getRandomTip}
-          className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 underline"
+          onClick={handleToggle}
+          className="w-full text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded transition-colors"
         >
-          New tip
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 pr-2">
+              💡 {randomTip.header}
+            </h3>
+            <span className="text-blue-600 dark:text-blue-400 text-sm font-medium flex-shrink-0">
+              {isExpanded ? 'Collapse' : 'Expand'}
+            </span>
+          </div>
         </button>
+        
+        {isExpanded && (
+          <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                Practical actions you can take:
+              </h4>
+              <ul className="space-y-2">
+                {randomTip.actions.map((action, index) => (
+                  <li key={index} className="flex items-start">
+                    <span className="text-blue-500 dark:text-blue-400 mr-2 flex-shrink-0 mt-0.5">•</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">{action}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
-      <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-        {SINGING_TIPS[currentTipIndex]}
-      </p>
     </div>
   );
 }
-

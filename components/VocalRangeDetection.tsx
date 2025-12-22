@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { detectPitch, frequencyToNote, Note } from '@/lib/audio-utils';
 import { saveLowNote, saveHighNote } from '@/lib/storage';
+import VolumeMeter from '@/components/VolumeMeter';
 
 interface VocalRangeDetectionProps {
   mode: 'low' | 'high';
@@ -22,9 +23,9 @@ export default function VocalRangeDetection({
   const [volumeLevel, setVolumeLevel] = useState(0);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const dataArrayRef = useRef<Float32Array | null>(null);
   const animationFrameRef = useRef<number | null>(null);
-  const volumeAnimationFrameRef = useRef<number | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const detectedNotesRef = useRef<Note[]>([]);
   const isRecordingRef = useRef(false);
@@ -46,28 +47,8 @@ export default function VocalRangeDetection({
         source.connect(analyser);
 
         analyserRef.current = analyser;
+        setAnalyser(analyser);
         dataArrayRef.current = new Float32Array(analyser.frequencyBinCount);
-
-        // Start volume monitoring
-        const monitorVolume = () => {
-          if (!analyserRef.current || !dataArrayRef.current) return;
-
-          const audioData = new Float32Array(dataArrayRef.current.length);
-          analyserRef.current.getFloatTimeDomainData(audioData);
-
-          // Calculate RMS (Root Mean Square) for volume level
-          let sum = 0;
-          for (let i = 0; i < audioData.length; i++) {
-            sum += audioData[i] * audioData[i];
-          }
-          const rms = Math.sqrt(sum / audioData.length);
-          const volume = Math.min(rms * 10, 1); // Scale and clamp to 0-1
-          setVolumeLevel(volume);
-
-          volumeAnimationFrameRef.current = requestAnimationFrame(monitorVolume);
-        };
-
-        monitorVolume();
       } catch (error) {
         console.error('Error accessing microphone:', error);
         // Don't show alert here, let the user try when they click "Start Singing"
@@ -77,9 +58,6 @@ export default function VocalRangeDetection({
     initializeMicrophone();
 
     return () => {
-      if (volumeAnimationFrameRef.current) {
-        cancelAnimationFrame(volumeAnimationFrameRef.current);
-      }
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
@@ -109,29 +87,8 @@ export default function VocalRangeDetection({
         source.connect(analyser);
 
         analyserRef.current = analyser;
+        setAnalyser(analyser);
         dataArrayRef.current = new Float32Array(analyser.frequencyBinCount);
-
-        // Start volume monitoring if not already running
-        if (!volumeAnimationFrameRef.current) {
-          const monitorVolume = () => {
-            if (!analyserRef.current || !dataArrayRef.current) return;
-
-            const audioData = new Float32Array(dataArrayRef.current.length);
-            analyserRef.current.getFloatTimeDomainData(audioData);
-
-            // Calculate RMS (Root Mean Square) for volume level
-            let sum = 0;
-            for (let i = 0; i < audioData.length; i++) {
-              sum += audioData[i] * audioData[i];
-            }
-            const rms = Math.sqrt(sum / audioData.length);
-            const volume = Math.min(rms * 10, 1);
-            setVolumeLevel(volume);
-
-            volumeAnimationFrameRef.current = requestAnimationFrame(monitorVolume);
-          };
-          monitorVolume();
-        }
       } catch (error) {
         console.error('Error accessing microphone:', error);
         alert('Could not access microphone. Please check permissions.');
@@ -228,20 +185,7 @@ export default function VocalRangeDetection({
           </p>
 
           {/* Volume Meter */}
-          <div className="mb-4">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Volume:</span>
-              <div className="flex-1 h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 transition-all duration-75 ease-out"
-                  style={{ width: `${volumeLevel * 100}%` }}
-                />
-              </div>
-              <span className="text-xs text-gray-500 dark:text-gray-500 w-10 text-right">
-                {Math.round(volumeLevel * 100)}%
-              </span>
-            </div>
-          </div>
+          <VolumeMeter analyser={analyserRef.current} onVolumeChange={setVolumeLevel} />
 
           {isRecording && (
             <div className="text-center mb-4">
