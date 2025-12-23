@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { PitchDataPoint } from '@/lib/storage';
 import { detectPitch } from '@/lib/audio-utils';
-import { BufferedAudio } from '@/lib/buffer-audio';
+import { BufferedAudio, CallBackType } from '@/lib/buffer-audio';
 import VolumeMeter from '@/components/VolumeMeter';
 import PracticeVisualization from '@/components/PracticeVisualization';
 import Timeline from './Timeline';
@@ -56,9 +56,12 @@ export default function PracticeView({
       bufferedAudioRef.current.init();
       
       // Set up callback for when playback ends
-      bufferedAudioRef.current.setOnEnded(() => {
-        setIsPlaying(false);
-        setPlaybackTime(0);
+      bufferedAudioRef.current.setOnEnded((event: Event) => {
+        const isSeeking = (event as CallBackType)?.detail?.isSeeking;
+        if (!isSeeking) {
+          setIsPlaying(false);
+          setPlaybackTime(0);
+        }
       });
     }
 

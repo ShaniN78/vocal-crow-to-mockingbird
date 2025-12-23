@@ -26,8 +26,25 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{
+          backgroundImage: "url('/background.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          backgroundAttachment: "fixed",
+          minHeight: "100vh",
+        }}
       >
-        {children}
+        <div className="min-h-screen bg-black/20">
+          <header className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-md">
+            <div className="container mx-auto px-4 py-4">
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+                Vocal Training
+              </h1>
+            </div>
+          </header>
+          <main>{children}</main>
+        </div>
       </body>
     </html>
   );

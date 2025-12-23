@@ -29,7 +29,10 @@
  * THE SOFTWARE.
  */
 
+export type CallBackType = CustomEvent<{ isSeeking: boolean }>;
+
 export class BufferedAudio {
+    private _isSeeking: boolean = false;
     private _audioContext: AudioContext;
     private _buffer: AudioBuffer;
     private _source: AudioBufferSourceNode;
@@ -68,7 +71,7 @@ export class BufferedAudio {
         }
   
         if (this._isPlaying) {
-          this.stop(); // Stop any existing playback if there is any
+          this.stop(true, true); // Stop any existing playback if there is any
           this._playbackTime = playbackTime;
           this.play(); // Resume playback at new time
         } else {
@@ -78,14 +81,15 @@ export class BufferedAudio {
   
       // Pause playback, keep track of where playback stopped
       public pause() {
-        this.stop(true);
+        this.stop(true, false);
       }
   
       // Stops or pauses playback and sets playbackTime accordingly
-      public stop(pause: boolean = false) {
+      public stop(pause: boolean = false, isSeeking: boolean = false) {
         console.log("Stop");
         if (!this._isPlaying) return;
         this._isPlaying = false; // Set to flag to endOfPlayback callback that this was set manually
+        this._isSeeking = isSeeking;
         try {
           this._source.stop(0);
         } catch (e) {
@@ -108,7 +112,7 @@ export class BufferedAudio {
         this.init();
       }
   
-      private _onEndedCallback: ((event: Event) => void) | null = null;
+      private _onEndedCallback: ((event: CallBackType) => void) | null = null;
 
       public init() {
         // Stop current playback if playing, but don't reinitialize (to avoid recursion)
@@ -128,7 +132,7 @@ export class BufferedAudio {
         this._source.onended = (event: Event) => {
           this.endOfPlayback(event);
           if (this._onEndedCallback) {
-            this._onEndedCallback(event);
+            this._onEndedCallback({ detail: { isSeeking: false } } as CallBackType);
           }
         };
         this._bufferDuration = this._buffer.duration;
@@ -153,13 +157,13 @@ export class BufferedAudio {
       }
 
       // Set custom end of playback callback
-      public setOnEnded(callback: (event: Event) => void) {
+      public setOnEnded(callback: (event: CallBackType) => void) {
         this._onEndedCallback = callback;
         if (this._source) {
           this._source.onended = (event: Event) => {
             this.endOfPlayback(event);
             if (this._onEndedCallback) {
-              this._onEndedCallback(event);
+              this._onEndedCallback({ detail: { isSeeking: this._isSeeking } } as CallBackType);
             }
           };
         }

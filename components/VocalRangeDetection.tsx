@@ -173,8 +173,8 @@ export default function VocalRangeDetection({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 w-full max-w-md">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] py-8">
+      <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl shadow-xl p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold text-center mb-6 text-gray-800 dark:text-white">
           Detect {mode === 'low' ? 'Low' : 'High'} Note
         </h2>

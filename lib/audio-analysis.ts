@@ -73,7 +73,17 @@ export async function loadAudioFile(file: File): Promise<AudioBuffer> {
 }
 
 /**
+ * Convert frequency difference to cents (musically accurate unit)
+ * 1 semitone = 100 cents, and frequency doubles every 12 semitones
+ */
+function frequencyToCents(freq1: number, freq2: number): number {
+  if (freq1 === 0 || freq2 === 0) return Infinity;
+  return 1200 * Math.log2(freq2 / freq1);
+}
+
+/**
  * Calculate performance score by comparing user pitch data to original
+ * Uses cents (musical intervals) for more accurate scoring
  */
 export function calculatePerformanceScore(
   originalPitchData: PitchDataPoint[],
@@ -84,11 +94,11 @@ export function calculatePerformanceScore(
   }
 
   let totalScore = 0;
-  let validComparisons = 0;
+  let totalComparisons = 0;
 
   // Match up time points (find closest user point for each original point)
   for (const originalPoint of originalPitchData) {
-    if (originalPoint.frequency === null) {
+    if (originalPoint.frequency === null || originalPoint.frequency <= 0) {
       continue; // Skip if no pitch detected in original
     }
 
@@ -104,27 +114,32 @@ export function calculatePerformanceScore(
       }
     }
 
-    if (closestUserPoint && closestUserPoint.frequency !== null && originalPoint.frequency !== null) {
-      // Calculate accuracy (0-1)
-      const diff = Math.abs(closestUserPoint.frequency - originalPoint.frequency);
-      const relativeDiff = diff / originalPoint.frequency;
+    if (closestUserPoint && closestUserPoint.frequency !== null && closestUserPoint.frequency > 0) {
+      totalComparisons++;
       
-      // Score: 1.0 for perfect match, 0.0 for >8% difference
-      const maxTolerance = 0.08;
-      if (relativeDiff <= maxTolerance) {
-        const normalized = 1 - (relativeDiff / maxTolerance);
-        const accuracy = Math.pow(normalized, 0.5); // Same curve as game mode
+      // Calculate difference in cents (musically accurate)
+      const centsDiff = Math.abs(frequencyToCents(originalPoint.frequency, closestUserPoint.frequency));
+      
+      // Strict tolerance: 50 cents = half a semitone (~3% frequency difference)
+      // This is the threshold for "in tune" - professional singers aim for <25 cents
+      const maxToleranceCents = 50;
+      
+      if (centsDiff <= maxToleranceCents) {
+        // Calculate accuracy: perfect (0 cents) = 1.0, at tolerance (50 cents) = 0.0
+        // Use a steeper curve (squared) so only very accurate singing gets high scores
+        const normalized = 1 - (centsDiff / maxToleranceCents);
+        const accuracy = normalized * normalized; // Squared curve - stricter scoring
         totalScore += accuracy;
-        validComparisons++;
       }
+      // If outside tolerance, accuracy = 0 (no points), but still counts as comparison
     }
   }
 
-  if (validComparisons === 0) {
+  if (totalComparisons === 0) {
     return 0;
   }
 
   // Return score as percentage (0-100)
-  return (totalScore / validComparisons) * 100;
+  return (totalScore / totalComparisons) * 100;
 }
 
